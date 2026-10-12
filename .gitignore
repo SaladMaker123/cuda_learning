@@ -1,0 +1,15 @@
+# CUDA 编译文件
+*.o
+*.obj
+*.ptx
+*.cubin
+*.fatbin
+
+# 实验 10 生成的可执行程序
+/10_memory_coalescing/coalesced
+/10_memory_coalescing/coalescing_benchmark
+
+# 日志和临时文件
+*.log
+*.swp
+*~

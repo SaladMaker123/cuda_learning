@@ -13,3 +13,12 @@
 *.log
 *.swp
 *~
+# Experiment 11: Reduction executables
+/11_reduction/partial_sum
+/11_reduction/shared_reduction
+/11_reduction/multi_block_reduction
+/11_reduction/atomic_reduction
+/11_reduction/large_reduction
+/11_reduction/reduction_benchmark
+/11_reduction/atomic_benchmark
+/11_reduction/fp32_reduction

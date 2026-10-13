@@ -22,3 +22,9 @@
 /11_reduction/reduction_benchmark
 /11_reduction/atomic_benchmark
 /11_reduction/fp32_reduction
+# Experiment 09: Variable specifiers executables
+/09_variable_specifiers/constant_variable
+/09_variable_specifiers/managed_variable
+/09_variable_specifiers/shared_blocks
+/09_variable_specifiers/shared_race
+/09_variable_specifiers/shared_variable

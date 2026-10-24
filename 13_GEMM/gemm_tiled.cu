@@ -103,8 +103,12 @@ int main() {
     CUDA_CHECK(cudaEventCreate(&start));
     CUDA_CHECK(cudaEventCreate(&stop));
     
-    // 1. 预热 Kernel
-    gemmTiled<<<grid, block>>>(d_A, d_B, d_C, M, N, K);
+    // 1. 预热 Kernel 10 次
+    const int warmup = 10;
+
+    for (int i = 0; i < warmup; ++i) {
+        gemmTiled<<<grid, block>>>(d_A, d_B, d_C, M, N, K);
+    }
 
     CUDA_CHECK(cudaGetLastError());
     CUDA_CHECK(cudaDeviceSynchronize());
@@ -167,6 +171,33 @@ int main() {
 
     CUDA_CHECK(cudaEventDestroy(start));
     CUDA_CHECK(cudaEventDestroy(stop));
+    // 查询理论 Occupancy
+    int device = 0;
+    CUDA_CHECK(cudaGetDevice(&device));
+
+    cudaDeviceProp prop{};
+    CUDA_CHECK(cudaGetDeviceProperties(&prop, device));
+
+    int activeBlocks = 0;
+    int threadsPerBlock = 16 * 16;
+
+    CUDA_CHECK(cudaOccupancyMaxActiveBlocksPerMultiprocessor(
+        &activeBlocks,
+        gemmTiled,
+        threadsPerBlock,
+        0
+    ));
+
+    int activeThreads = activeBlocks * threadsPerBlock;
+
+    double occupancy =
+        100.0 * activeThreads / prop.maxThreadsPerMultiProcessor;
+
+    std::cout << "Tiled GEMM Occupancy:\n";
+    std::cout << "Active blocks per SM: " << activeBlocks << "\n";
+    std::cout << "Active threads per SM: " << activeThreads << "\n";
+    std::cout << "Theoretical occupancy: " << occupancy << "%"
+            << std::endl;
         
     return 0;
 }

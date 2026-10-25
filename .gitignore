@@ -28,3 +28,15 @@
 /09_variable_specifiers/shared_blocks
 /09_variable_specifiers/shared_race
 /09_variable_specifiers/shared_variable
+# CUDA compiled executables
+/12_2D_thread_mapping/matrix_add
+/12_2D_thread_mapping/matrix_transpose
+/12_2D_thread_mapping/thread2d_basic
+/12_2D_thread_mapping/transpose_shared
+
+/experiment18/warp_shuffle_reduce
+/experiment18/reduce_general
+/experiment18/reduce_ilp4
+
+# Build output directory
+/build/

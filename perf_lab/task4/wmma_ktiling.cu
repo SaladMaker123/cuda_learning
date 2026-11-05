@@ -7,9 +7,9 @@
 
 namespace wmma = nvcuda::wmma;
 
-constexpr int M = 128;
-constexpr int N = 128;
-constexpr int K = 64;
+constexpr int M = 512;
+constexpr int N = 512;
+constexpr int K = 256;
 constexpr int BK = 16;
 
 // ============================================
@@ -131,10 +131,60 @@ int main()
     // 每个 Block：128 Threads = 4 Warps
     dim3 grid(N / 32, M / 32);
 
-    wmmaKTiling<<<grid, 128>>>(dA, dB, dC);
+    
+    // ========================================
+    // Benchmark：Warmup + CUDA Event
+    // ========================================
+
+    constexpr int WARMUP = 20;
+    constexpr int REPEAT = 1000;
+
+    // 1. 预热
+    for (int i = 0; i < WARMUP; ++i)
+    {
+        wmmaKTiling<<<grid, 128>>>(dA, dB, dC);
+    }
 
     CUDA_CHECK(cudaGetLastError());
     CUDA_CHECK(cudaDeviceSynchronize());
+
+    // 2. 创建 CUDA Events
+    cudaEvent_t start, stop;
+
+    CUDA_CHECK(cudaEventCreate(&start));
+    CUDA_CHECK(cudaEventCreate(&stop));
+
+    // 3. 正式测量
+    CUDA_CHECK(cudaEventRecord(start));
+
+    for (int i = 0; i < REPEAT; ++i)
+    {
+        wmmaKTiling<<<grid, 128>>>(dA, dB, dC);
+    }
+
+    CUDA_CHECK(cudaGetLastError());
+
+    CUDA_CHECK(cudaEventRecord(stop));
+    CUDA_CHECK(cudaEventSynchronize(stop));
+
+    // 4. 计算平均时间
+    float totalMs = 0.0f;
+
+    CUDA_CHECK(cudaEventElapsedTime(
+        &totalMs,
+        start,
+        stop
+    ));
+
+    float avgMs = totalMs / REPEAT;
+
+    std::cout << "Average Kernel Time: "
+              << avgMs << " ms" << std::endl;
+
+    // 5. 释放 Events
+    CUDA_CHECK(cudaEventDestroy(start));
+    CUDA_CHECK(cudaEventDestroy(stop));
+
 
     // GPU -> CPU
     CUDA_CHECK(cudaMemcpy(

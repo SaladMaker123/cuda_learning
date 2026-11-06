@@ -40,4 +40,14 @@
 
 # Build output directory
 /build/
-/experiment17/bank_conflict
+/experiment17/bank_conflict# Task 4-6: ignore compiled WMMA executables
+/perf_lab/task[456]/wmma_*
+
+# Keep source code and documentation
+!/perf_lab/task[456]/wmma_*.cu
+!/perf_lab/task[456]/wmma_*.cuh
+!/perf_lab/task[456]/wmma_*.h
+!/perf_lab/task[456]/wmma_*.md
+!/perf_lab/task[456]/wmma_*.py
+!/perf_lab/task[456]/wmma_*.sh
+
